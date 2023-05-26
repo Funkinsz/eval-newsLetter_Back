@@ -26,13 +26,4 @@ router.get("/read", async (req, res) => {
   });
 });
 
-router.get("/count", async (req, res) => {
-  const count = "SELECT * FROM news";
-
-  connection.query(count, (err, result) => {
-    if (err) throw err;
-    res.send(JSON.stringify(result.length));
-  });
-});
-
 module.exports = router;
