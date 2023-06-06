@@ -65,8 +65,9 @@ router.get("/last", async (req, res) => {
   });
 });
 
-router.get("/musique", async (req, res) => {
-  const sql = `SELECT * FROM news WHERE type LIKE "MUSIQUE" ORDER BY viewCounter DESC LIMIT 5`;
+router.get("/theme", async (req, res) => {
+  const t = req.query.t
+  const sql = `SELECT * FROM news WHERE type LIKE "${t}" ORDER BY viewCounter DESC LIMIT 5`;
 
   connection.query(sql, (err, result) => {
     if (err) throw err;
