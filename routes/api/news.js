@@ -7,7 +7,7 @@ router.post("/", async (req, res) => {
   const { title, type, content } = req.body;
 
   const sql = `INSERT INTO news(title, type, date, content) VALUES("", "", DATE( NOW() ), "?")`;
-  const value = [title, type, content]
+  const value = [title, type, content];
 
   console.log(sql);
   connection.query(sql, value, (err, result) => {
@@ -29,10 +29,10 @@ router.get("/read", async (req, res) => {
 });
 
 router.get("/resume", async (req, res) => {
-  const id = req.query.id
+  const id = req.query.id;
 
   const sql = "SELECT * FROM news WHERE id = ?";
-  const value = id
+  const value = id;
 
   connection.query(sql, value, (err, result) => {
     if (err) throw err;
@@ -43,10 +43,10 @@ router.get("/resume", async (req, res) => {
 
 // UPDATE
 router.get("/count", async (req, res) => {
-  const id = req.query.id
+  const id = req.query.id;
 
   const sql = "UPDATE news SET viewCounter = viewcounter + 1 WHERE id = ?";
-  const value = id
+  const value = id;
 
   connection.query(sql, value, (err, result) => {
     if (err) throw err;
@@ -66,8 +66,19 @@ router.get("/last", async (req, res) => {
 });
 
 router.get("/theme", async (req, res) => {
-  const t = req.query.t
+  const t = req.query.t;
   const sql = `SELECT * FROM news WHERE type LIKE "${t}" ORDER BY viewCounter DESC LIMIT 5`;
+
+  connection.query(sql, (err, result) => {
+    if (err) throw err;
+    console.log("Reading news letter");
+    res.send(JSON.stringify(result));
+  });
+});
+
+router.get("/musique", async (req, res) => {
+  const t = req.query.t;
+  const sql = `SELECT * FROM news WHERE type LIKE "MUSIQUE" ORDER BY viewCounter DESC LIMIT 5`;
 
   connection.query(sql, (err, result) => {
     if (err) throw err;
