@@ -19,7 +19,13 @@ router.post("/", async (req, res) => {
 
 // SELECT
 router.get("/read", async (req, res) => {
-  const sql = "SELECT * FROM news ORDER BY id DESC";
+  connection.query("SELECT * FROM news ORDER BY id DESC", (err, result) => {
+    if (err) throw err;
+    res.send(JSON.stringify(result))
+  })
+})
+router.get("/readHome", async (req, res) => {
+  const sql = "SELECT n.* FROM news AS n LEFT JOIN (SELECT id FROM news ORDER BY id DESC LIMIT 3) AS subquery ON n.id = subquery.id WHERE subquery.id IS NULL ORDER BY id DESC LIMIT 6";
 
   connection.query(sql, (err, result) => {
     if (err) throw err;
@@ -27,6 +33,13 @@ router.get("/read", async (req, res) => {
     res.send(JSON.stringify(result));
   });
 });
+
+router.get("/moreView", async (req, res) => {
+  connection.query("SELECT * FROM news ORDER BY viewCounter DESC LIMIT 4", (err, result) => {
+    if (err) throw err;
+    res.send(JSON.stringify(result))
+  })
+})
 
 router.get("/resume", async (req, res) => {
   const id = req.query.id;
@@ -41,22 +54,8 @@ router.get("/resume", async (req, res) => {
   });
 });
 
-// UPDATE
-router.get("/count", async (req, res) => {
-  const id = req.query.id;
-
-  const sql = "UPDATE news SET viewCounter = viewcounter + 1 WHERE id = ?";
-  const value = id;
-
-  connection.query(sql, value, (err, result) => {
-    if (err) throw err;
-    console.log("Reading news letter / 3");
-    res.send(JSON.stringify(result));
-  });
-});
-
 router.get("/last", async (req, res) => {
-  const sql = "SELECT * FROM news ORDER BY id DESC LIMIT 10";
+  const sql = "SELECT * FROM news ORDER BY id DESC LIMIT 3";
 
   connection.query(sql, (err, result) => {
     if (err) throw err;
@@ -113,6 +112,20 @@ router.get("/event", async (req, res) => {
   connection.query(sql, (err, result) => {
     if (err) throw err;
     console.log("Reading news letter");
+    res.send(JSON.stringify(result));
+  });
+});
+
+// UPDATE
+router.get("/count", async (req, res) => {
+  const id = req.query.id;
+
+  const sql = "UPDATE news SET viewCounter = viewcounter + 1 WHERE id = ?";
+  const value = id;
+
+  connection.query(sql, value, (err, result) => {
+    if (err) throw err;
+    console.log("Reading news letter / 3");
     res.send(JSON.stringify(result));
   });
 });
