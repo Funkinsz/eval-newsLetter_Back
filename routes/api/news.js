@@ -41,6 +41,13 @@ router.get("/moreView", async (req, res) => {
   })
 })
 
+router.get("/moreLike", async (req, res) => {
+  connection.query("SELECT * FROM news ORDER BY liked DESC LIMIT 4", (err, result) => {
+    if (err) throw err;
+    res.send(JSON.stringify(result))
+  })
+})
+
 router.get("/resume", async (req, res) => {
   const id = req.query.id;
 
@@ -63,6 +70,7 @@ router.get("/last", async (req, res) => {
     res.send(JSON.stringify(result));
   });
 });
+
 
 router.get("/theme", async (req, res) => {
   const t = req.query.t;
