@@ -18,7 +18,7 @@ router.post("/", async (req, res) => {
 
 // SELECT
 router.get("/read", async (req, res) => {
-  const user = req.query.user.id;
+  const user = req.query.user;
 
   connection.query("SELECT * FROM news ORDER BY idNews DESC", (err, result) => {
     if (err) throw err;
@@ -58,7 +58,7 @@ router.get("/read", async (req, res) => {
 });
 
 router.get("/readHome", async (req, res) => {
-  const user = req.query.user.id;
+  const user = req.query.user;
 
   const sql =
     "SELECT n.* FROM news AS n LEFT JOIN (SELECT idNews FROM news ORDER BY idNews DESC LIMIT 3) AS subquery ON n.idNews = subquery.idNews WHERE subquery.idNews IS NULL ORDER BY idNews DESC LIMIT 6";
@@ -102,7 +102,7 @@ router.get("/readHome", async (req, res) => {
 });
 
 router.get("/moreView", async (req, res) => {
-  const user = req.query.user.id;
+  const user = req.query.user;
 
   connection.query(
     "SELECT * FROM news ORDER BY viewCounter DESC LIMIT 4",
@@ -145,7 +145,7 @@ router.get("/moreView", async (req, res) => {
 });
 
 router.get("/moreLike", async (req, res) => {
-  const user = req.query.user.id;
+  const user = req.query.user;
 
   connection.query(
     "SELECT * FROM news ORDER BY liked DESC LIMIT 4",
@@ -189,14 +189,14 @@ router.get("/moreLike", async (req, res) => {
 
 router.get("/resume", async (req, res) => {
   const id = req.query.id;
-  const user = req.query.user.id;
+  const user = req.query.user;
 
   const sql = `SELECT * FROM news WHERE idNews = ${id}`;
 
   connection.query(sql, (err, result) => {
     if (err) throw err;
     if (user) {
-      liked = `SELECT * FROM liked WHERE idUser = ${user} AND isLike = 1`;
+      const liked = `SELECT * FROM liked WHERE idUser = ${user} AND isLike = 1`;
       connection.query(liked, (err, resLiked) => {
         if (err) throw err;
 
@@ -232,7 +232,7 @@ router.get("/resume", async (req, res) => {
 });
 
 router.get("/last", async (req, res) => {
-  const user = req.query.user.id;
+  const user = req.query.user;
   const sql = "SELECT * FROM news ORDER BY idNews DESC LIMIT 3";
 
   connection.query(sql, (err, result) => {
@@ -275,17 +275,15 @@ router.get("/last", async (req, res) => {
 
 router.get("/theme", async (req, res) => {
   const t = req.query.t;
-  const user = req.query.user.id;
-
+  const user = req.query.user;
   const sql = `SELECT * FROM news WHERE type LIKE "${t}" ORDER BY viewCounter DESC LIMIT 5`;
 
   connection.query(sql, (err, result) => {
     if (err) throw err;
     if (user) {
-      liked = `SELECT * FROM liked WHERE idUser = ${user} AND isLike = 1`;
+      const liked = `SELECT * FROM liked WHERE idUser = ${user} AND isLike = 1`;
       connection.query(liked, (err, resLiked) => {
         if (err) throw err;
-
         for (let i = 0; i < result.length; i++) {
           result[i].isLike = 0;
         }
@@ -297,10 +295,10 @@ router.get("/theme", async (req, res) => {
         idNewsSet = new Set();
 
         const updateArray = array.map((obj) => {
-          if (idNewsSet.has(obj.id)) {
+          if (idNewsSet.has(obj.idNews)) {
             obj.isLike = 1;
           } else {
-            idNewsSet.add(obj.id);
+            idNewsSet.add(obj.idNews);
           }
           return obj;
         });
@@ -420,6 +418,18 @@ router.post("/like", async (req, res) => {
         res.send(JSON.stringify(result));
       });
     }
+  });
+});
+
+// USER
+router.get("/myLikes", async (req, res) => {
+  const user = req.query.user;
+
+  const sql = `SELECT * FROM liked, news WHERE idUser = ${user} AND news.idNews = liked.idNews ORDER BY id DESC LIMIT 6`;
+
+  connection.query(sql, (err, result) => {
+    if (err) throw err;
+    res.send(JSON.stringify(result));
   });
 });
 

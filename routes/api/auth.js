@@ -23,7 +23,7 @@ router.post("/", (req, res) => {
               algorithm: "RS256",
             });
             res.cookie("myNewsToken", token, {httpOnly: true});
-            console.log(token);
+            // console.log(token);
             res.send(user);
           } else {
             res.send(JSON.stringify(null));
@@ -43,18 +43,18 @@ router.post("/", (req, res) => {
 router.get("/current", async (req, res) => {
   const { myNewsToken } = req.cookies;
 
-  console.log({ myNewsToken });
+  // console.log({ myNewsToken });
   if (myNewsToken) {
     try {
       const decodedToken = jwt.verify(myNewsToken, keyPub);
-      console.log(decodedToken);
+      // console.log(decodedToken);
 
       const sql = `SELECT id, email, pseudo, rôle FROM user WHERE id = ${decodedToken.sub}`;
 
       connection.query(sql, (err, result) => {
         if (err) throw err;
         const currentUser = result[0];
-        console.log(currentUser);
+        // console.log(currentUser);
         if (currentUser) {
           res.send(currentUser);
         } else {
